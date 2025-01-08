@@ -1,8 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpCircle, ArrowDownCircle, Wallet, PiggyBank, Target, Calendar } from "lucide-react";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router";
 
 const Body = () => {
+  const navigate = useNavigate();
   const data = {
     saldo: 4500.0,
     receitas: 6000.0,
@@ -40,7 +42,7 @@ const Body = () => {
           {/* Receitas */}
           <Card className="bg-white">
             <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex gap-4 items-center mb-4">
                 <ArrowUpCircle className="w-6 h-6 text-green-500" />
                 <span className="text-sm text-gray-500">Receitas</span>
               </div>
@@ -51,9 +53,9 @@ const Body = () => {
           </Card>
 
           {/* Despesas */}
-          <Card className="bg-white">
+          <Card className="bg-white cursor-pointer" onClick={() => navigate("/despesas")}>
             <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex gap-4 items-center mb-4">
                 <ArrowDownCircle className="w-6 h-6 text-red-500" />
                 <span className="text-sm text-gray-500">Despesas</span>
               </div>
@@ -66,7 +68,7 @@ const Body = () => {
           {/* Investimentos */}
           <Card className="bg-white">
             <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex gap-4 items-center mb-4">
                 <PiggyBank className="w-6 h-6 text-purple-500" />
                 <span className="text-sm text-gray-500">Investimentos</span>
               </div>
@@ -78,7 +80,7 @@ const Body = () => {
         </div>
 
         {/* Seção Inferior */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {/* Próximas Contas */}
           <Card className="bg-white">
             <CardContent className="p-6">

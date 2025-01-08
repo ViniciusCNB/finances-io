@@ -1,14 +1,17 @@
-import Body from "./components/Body";
-import Header from "./components/Header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { BrowserRouter, Routes, Route } from "react-router";
+import Home from "./pages/Home";
+import Expenses from "./pages/Expenses";
 
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <div className="bg-[#f1f3ee] dark:bg-[#212c40] w-screen h-screen relative">
-        <Header />
-        <Body />
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/despesas" element={<Expenses />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };
