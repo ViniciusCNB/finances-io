@@ -1,6 +1,6 @@
 import ExpenseDialog from "@/components/dialogs/ExpenseDialog";
 import Header from "@/components/Header";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Expenses = () => {
@@ -17,7 +17,6 @@ const Expenses = () => {
           <Card className="bg-white w-3/4">
             <CardContent className="p-2">
               <Table>
-                {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                 <TableHeader>
                   <TableRow>
                     <TableHead>Descrição</TableHead>
