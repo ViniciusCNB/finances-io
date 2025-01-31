@@ -27,6 +27,7 @@ Neste trabalho não serão consideradas integrações com APIs de cotação em t
 ### 4. Protótipo
 
 Páginas a serem elaboradas:
+- Página de autenticação;
 - Página principal;
 - Página de despesas;
 - Página de receitas;
