@@ -27,13 +27,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased vsc-initialized`}
       >
         <Header />
         <div className="fixed left-0 top-16 bottom-0 w-56 bg-white shadow-sm z-20 transition-transform duration-300 ease-in-out md:translate-x-0">
           <Sidebar />
         </div>
-        <main className="pl-56 pt-16 container min-h-screen min-w-screen transition-all duration-300">
+        <main className="ml-56 mt-16 container min-h-screen transition-all duration-300 flex items-center justify-center">
           <div className="p-8">{children}</div>
         </main>
       </body>
