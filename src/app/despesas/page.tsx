@@ -96,6 +96,33 @@ const Despesas = () => {
       observacao: "Mensalidade",
       forma_pagamento: "Débito Automático",
     },
+    {
+      id: 8,
+      descricao: "Academia",
+      data: "2023-05-05",
+      valor: 120,
+      categoria_despesa: "Lazer",
+      observacao: "Mensalidade",
+      forma_pagamento: "Débito Automático",
+    },
+    {
+      id: 9,
+      descricao: "Academia",
+      data: "2023-06-07",
+      valor: 500,
+      categoria_despesa: "Lazer",
+      observacao: "Mensalidade",
+      forma_pagamento: "Débito Automático",
+    },
+    {
+      id: 10,
+      descricao: "Academia",
+      data: "2023-07-10",
+      valor: 320,
+      categoria_despesa: "Lazer",
+      observacao: "Mensalidade",
+      forma_pagamento: "Débito Automático",
+    },
   ]);
 
   // Função para filtrar as despesas com base nos filtros aplicados
@@ -191,8 +218,12 @@ const Despesas = () => {
     setIsFilterModalOpen(false);
   };
 
+  const formatPriceValue = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-[1200px]">
       {/* Cabeçalho com título e botões */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Despesas</h1>
@@ -222,19 +253,19 @@ const Despesas = () => {
         {/* Card com total de despesas */}
         <div className="p-6 bg-white rounded-xl shadow-sm">
           <h3 className="text-sm font-medium text-gray-500">Total de Despesas</h3>
-          <p className="text-3xl font-bold mt-2">R$ {totalDespesas.toFixed(2)}</p>
+          <p className="text-3xl font-bold mt-2">{formatPriceValue(totalDespesas)}</p>
           <div className="text-sm text-gray-500 mt-1">
             {despesasFiltradas.length} {despesasFiltradas.length === 1 ? "despesa" : "despesas"}
             {Object.keys(filtrosAplicados).length > 0 ? " (filtradas)" : ""}
           </div>
         </div>
-
-        {/* Gráficos */}
-        <GraficosDespesas despesas={despesasFiltradas} />
       </div>
 
       {/* Tabela de despesas */}
       <TabelaDespesas despesas={despesasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
+
+      {/* Gráficos */}
+      <GraficosDespesas despesas={despesasFiltradas} />
 
       {/* Modal para adicionar/editar despesa */}
       {isFormModalOpen && (

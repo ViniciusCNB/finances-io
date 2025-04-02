@@ -74,6 +74,10 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
     );
   };
 
+  const formatPriceValue = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -150,7 +154,9 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatarData(despesa.data)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ {despesa.valor.toFixed(2)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatPriceValue(despesa.valor)}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{despesa.categoria_despesa}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{despesa.forma_pagamento}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

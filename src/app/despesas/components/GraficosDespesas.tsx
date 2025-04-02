@@ -1,5 +1,23 @@
 "use client";
 
+import {
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart as RechartsLineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Sector,
+} from "recharts";
+import { useState } from "react";
+
 interface GraficosDespesasProps {
   despesas: Array<{
     id: number;
@@ -12,7 +30,24 @@ interface GraficosDespesasProps {
   }>;
 }
 
+// Cores para os gráficos
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#A28BFF",
+  "#FF6F91",
+  "#4CAF50",
+  "#03A9F4",
+  "#FF5722",
+  "#9C27B0",
+];
+
 export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
+  // Estado para controlar o setor ativo no gráfico de pizza
+  const [activeIndex, setActiveIndex] = useState(0);
+
   // Calcula total por categoria
   const totalPorCategoria = despesas.reduce((acc, despesa) => {
     const categoria = despesa.categoria_despesa;
@@ -35,143 +70,162 @@ export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
     return acc;
   }, {} as Record<string, number>);
 
-  // Converte os dados para arrays ordenados
-  const categoriasSorted = Object.entries(totalPorCategoria).sort((a, b) => b[1] - a[1]);
+  // Formatação dos dados para o Recharts
+  const dadosCategoria = Object.entries(totalPorCategoria)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, value]) => ({ name, value }));
 
-  const formasPagamentoSorted = Object.entries(totalPorFormaPagamento).sort((a, b) => b[1] - a[1]);
+  const dadosFormaPagamento = Object.entries(totalPorFormaPagamento).map(([name, value]) => ({ name, value }));
 
-  const mesesSorted = Object.entries(totalPorMes).sort((a, b) => {
-    const [mes1, ano1] = a[0].split("/");
-    const [mes2, ano2] = b[0].split("/");
+  const dadosEvolucao = Object.entries(totalPorMes)
+    .sort((a, b) => {
+      const [mes1, ano1] = a[0].split("/");
+      const [mes2, ano2] = b[0].split("/");
 
-    if (ano1 !== ano2) return parseInt(ano1) - parseInt(ano2);
-    return parseInt(mes1) - parseInt(mes2);
-  });
+      if (ano1 !== ano2) return parseInt(ano1) - parseInt(ano2);
+      return parseInt(mes1) - parseInt(mes2);
+    })
+    .map(([name, value]) => ({ name, value }));
 
-  // Componente para representar o gráfico de barras
-  const BarChart = ({
-    data,
-    title,
-    colorClass = "bg-blue-500",
-  }: {
-    data: [string, number][];
-    title: string;
-    colorClass?: string;
-  }) => {
-    const max = Math.max(...data.map(([_, value]) => value));
-
-    return (
-      <div className="h-48">
-        <h3 className="text-sm font-medium text-gray-500 mb-4">{title}</h3>
-        <div className="flex flex-col h-36 gap-2">
-          {data.map(([label, value], index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="w-24 text-xs text-right text-gray-600 truncate" title={label}>
-                {label}
-              </div>
-              <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                <div className={`h-full ${colorClass} rounded-full`} style={{ width: `${(value / max) * 100}%` }} />
-              </div>
-              <div className="w-20 text-xs text-gray-600">R$ {value.toFixed(2)}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const formatPriceValue = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
-  // Componente para representar o gráfico de linha
-  const LineChart = ({ data }: { data: [string, number][] }) => {
-    const max = Math.max(...data.map(([_, value]) => value));
-    const min = Math.min(...data.map(([_, value]) => value));
-    const range = max - min;
+  // Handler para o gráfico de pizza ativo
+  const onPieEnter = (_: any, index: number) => {
+    setActiveIndex(index);
+  };
+
+  // Componente para renderizar o setor ativo do gráfico de pizza
+  const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value } = props;
 
     return (
-      <div className="h-48">
-        <h3 className="text-sm font-medium text-gray-500 mb-4">Evolução de Despesas</h3>
-        <div className="relative h-36 border-l border-b border-gray-300">
-          {/* Eixo Y - Valores */}
-          <div className="absolute top-0 left-0 h-full -translate-x-8 flex flex-col justify-between text-xs text-gray-500">
-            <span>R$ {max.toFixed(0)}</span>
-            <span>R$ {min.toFixed(0)}</span>
-          </div>
-
-          {/* Pontos do gráfico */}
-          <div className="absolute inset-0 pt-2">
-            <div className="relative h-full flex items-end">
-              {data.map(([label, value], index) => {
-                const heightPercent = range ? ((value - min) / range) * 100 : 0;
-
-                return (
-                  <div key={index} className="flex flex-col items-center flex-1">
-                    <div
-                      className="w-3 h-3 rounded-full bg-blue-500 z-10 mb-1"
-                      style={{
-                        marginBottom: `${heightPercent}%`,
-                      }}
-                    />
-                    <div className="absolute bottom-0 w-full">
-                      <div className="h-8 -mb-8 flex justify-center">
-                        <span className="text-xs text-gray-500 whitespace-nowrap">{label}</span>
-                      </div>
-                    </div>
-
-                    {/* Linha de conexão com o próximo ponto */}
-                    {index < data.length - 1 && (
-                      <div
-                        className="absolute h-0.5 bg-blue-500 z-0"
-                        style={{
-                          bottom: `${heightPercent}%`,
-                          left: `${(index + 0.5) * (100 / data.length)}%`,
-                          width: `${100 / data.length}%`,
-                          transform: "translateY(1.5px)",
-                        }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+      <g>
+        <text x={cx} y={cy} dy={-20} textAnchor="middle" fill="#333" fontSize={12}>
+          {payload.name}
+        </text>
+        <text x={cx} y={cy} dy={8} textAnchor="middle" fill="#333" fontSize={16} fontWeight={500}>
+          {formatPriceValue(value)}
+        </text>
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius + 5}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+      </g>
     );
   };
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* Gráfico de Evolução */}
-      <div className="p-6 bg-white rounded-xl shadow-sm md:col-span-2">
-        {mesesSorted.length > 0 ? (
-          <LineChart data={mesesSorted} />
+      <div className="p-6 bg-white rounded-xl shadow-sm col-span-2">
+        <h3 className="text-sm font-semibold text-gray-600 mb-5">Evolução dos Gastos</h3>
+        {dadosEvolucao.length > 0 ? (
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsLineChart data={dadosEvolucao} margin={{ top: 10, right: 30, left: 30, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} tickMargin={10} />
+                <YAxis tickFormatter={formatPriceValue} tick={{ fontSize: 12 }} />
+                <Tooltip
+                  formatter={(value: number) => [formatPriceValue(value), "Valor"]}
+                  labelStyle={{ fontWeight: "bold", color: "#333" }}
+                  contentStyle={{
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    border: "none",
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#0088FE"
+                  strokeWidth={2}
+                  dot={{ r: 5, fill: "#0088FE" }}
+                  activeDot={{ r: 7, fill: "#0088FE", stroke: "white", strokeWidth: 2 }}
+                />
+              </RechartsLineChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
-          <div className="h-48 flex items-center justify-center">
+          <div className="h-80 flex items-center justify-center">
             <p className="text-gray-400">Sem dados para exibir</p>
           </div>
         )}
       </div>
 
       {/* Gráfico por Categoria */}
-      <div className="p-6 bg-white rounded-xl shadow-sm">
-        {categoriasSorted.length > 0 ? (
-          <BarChart data={categoriasSorted.slice(0, 5)} title="Despesas por Categoria" colorClass="bg-blue-500" />
+      <div className="p-6 bg-white rounded-xl shadow-sm h-full">
+        <h3 className="text-sm font-semibold text-gray-600 mb-5">Despesas por Categoria</h3>
+        {dadosCategoria.length > 0 ? (
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
+                  data={dadosCategoria}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={90}
+                  outerRadius={120}
+                  dataKey="value"
+                  onMouseEnter={onPieEnter}
+                >
+                  {dadosCategoria.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => [formatPriceValue(value), "Valor"]} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
-          <div className="h-48 flex items-center justify-center">
+          <div className="h-72 flex items-center justify-center">
             <p className="text-gray-400">Sem dados para exibir</p>
           </div>
         )}
       </div>
 
       {/* Gráfico por Forma de Pagamento */}
-      <div className="p-6 bg-white rounded-xl shadow-sm">
-        {formasPagamentoSorted.length > 0 ? (
-          <BarChart data={formasPagamentoSorted} title="Despesas por Forma de Pagamento" colorClass="bg-green-500" />
+      <div className="p-6 bg-white rounded-xl shadow-sm h-full">
+        <h3 className="text-sm font-semibold text-gray-600 mb-5">Despesas por Forma de Pagamento</h3>
+        {dadosFormaPagamento.length > 0 ? (
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsBarChart
+                data={dadosFormaPagamento}
+                layout="vertical"
+                margin={{ top: 0, right: 30, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} opacity={0.3} />
+                <XAxis type="number" tickFormatter={formatPriceValue} tick={{ fontSize: 12 }} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={90} />
+                <Tooltip
+                  formatter={(value: number) => [formatPriceValue(value), "Valor"]}
+                  labelStyle={{ fontWeight: "bold", color: "#333" }}
+                  contentStyle={{
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    border: "none",
+                  }}
+                />
+                <Bar dataKey="value" fill="#00C49F" radius={[0, 4, 4, 0]} barSize={34} />
+              </RechartsBarChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
-          <div className="h-48 flex items-center justify-center">
+          <div className="h-72 flex items-center justify-center">
             <p className="text-gray-400">Sem dados para exibir</p>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
