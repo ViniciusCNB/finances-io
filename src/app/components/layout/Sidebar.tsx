@@ -20,20 +20,20 @@ const Sidebar: React.FC = () => {
           </li>
           <li>
             <Link
-              href="/despesas"
-              className="flex items-center p-3 text-slate-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-all duration-300 font-medium"
-            >
-              <FiShoppingBag className="w-5 h-5 mr-3 text-slate-600" />
-              <span>Despesas</span>
-            </Link>
-          </li>
-          <li>
-            <Link
               href="/receitas"
               className="flex items-center p-3 text-slate-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-all duration-300 font-medium"
             >
               <FiDollarSign className="w-5 h-5 mr-3 text-slate-600" />
               <span>Receitas</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/despesas"
+              className="flex items-center p-3 text-slate-600 rounded-lg bg-blue-50 hover:bg-blue-100 transition-all duration-300 font-medium"
+            >
+              <FiShoppingBag className="w-5 h-5 mr-3 text-slate-600" />
+              <span>Despesas</span>
             </Link>
           </li>
           <li>
