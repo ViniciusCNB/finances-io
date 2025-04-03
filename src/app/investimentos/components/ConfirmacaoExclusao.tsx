@@ -12,7 +12,7 @@ interface ConfirmacaoExclusaoProps {
 
 export default function ConfirmacaoExclusao({ onClose, onConfirm, item }: ConfirmacaoExclusaoProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-full max-w-md">
         <div className="flex items-center justify-center mb-4 text-red-500">
           <FiAlertTriangle size={48} />

@@ -2,16 +2,7 @@
 
 import { useState } from "react";
 import { FiArrowUp, FiArrowDown, FiEdit2, FiTrash2 } from "react-icons/fi";
-
-interface Despesa {
-  id: number;
-  descricao: string;
-  data: string;
-  valor: number;
-  categoria_despesa: string;
-  observacao: string;
-  forma_pagamento: string;
-}
+import { Despesa } from "@/services/despesasService";
 
 interface TabelaDespesasProps {
   despesas: Despesa[];
@@ -19,7 +10,7 @@ interface TabelaDespesasProps {
   onDelete: (id: number) => void;
 }
 
-type OrderBy = "descricao" | "data" | "valor" | "categoria_despesa" | "forma_pagamento";
+type OrderBy = "descricao" | "data" | "valor" | "categoria" | "forma_pagamento";
 type OrderDirection = "asc" | "desc";
 
 export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDespesasProps) {
@@ -43,13 +34,15 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
         comparison = a.descricao.localeCompare(b.descricao);
         break;
       case "data":
-        comparison = new Date(a.data).getTime() - new Date(b.data).getTime();
+        const dateA = new Date(a.data);
+        const dateB = new Date(b.data);
+        comparison = dateA.getTime() - dateB.getTime();
         break;
       case "valor":
         comparison = a.valor - b.valor;
         break;
-      case "categoria_despesa":
-        comparison = a.categoria_despesa.localeCompare(b.categoria_despesa);
+      case "categoria":
+        comparison = a.categoria.localeCompare(b.categoria);
         break;
       case "forma_pagamento":
         comparison = a.forma_pagamento.localeCompare(b.forma_pagamento);
@@ -59,8 +52,8 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
     return orderDirection === "asc" ? comparison : -comparison;
   });
 
-  const formatarData = (dataString: string) => {
-    const data = new Date(dataString);
+  const formatarData = (dataString: string | Date) => {
+    const data = dataString instanceof Date ? dataString : new Date(dataString);
     return data.toLocaleDateString("pt-BR");
   };
 
@@ -117,11 +110,11 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("categoria_despesa")}
+                onClick={() => handleSort("categoria")}
               >
                 <span className="flex items-center">
                   Categoria
-                  <SortArrow column="categoria_despesa" />
+                  <SortArrow column="categoria" />
                 </span>
               </th>
               <th
@@ -157,7 +150,7 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatPriceValue(despesa.valor)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{despesa.categoria_despesa}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{despesa.categoria}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{despesa.forma_pagamento}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
@@ -168,7 +161,7 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
                       <FiEdit2 size={18} />
                     </button>
                     <button
-                      onClick={() => onDelete(despesa.id)}
+                      onClick={() => onDelete(despesa.id as number)}
                       className="text-red-600 hover:text-red-900"
                       title="Excluir"
                     >

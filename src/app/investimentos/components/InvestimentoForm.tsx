@@ -2,18 +2,12 @@
 
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
+import { Investimento } from "@/services/investimentosService";
 
 interface InvestimentoFormProps {
   onClose: () => void;
-  onSave: (investimento: any) => void;
-  investimento?: {
-    id?: number;
-    descricao: string;
-    valor: number;
-    quantidade: number;
-    tipo: string;
-    instituicao: string;
-  };
+  onSave: (investimento: Investimento) => void;
+  investimento?: Investimento;
   tiposInvestimento: readonly string[];
 }
 
@@ -84,7 +78,7 @@ export default function InvestimentoForm({ onClose, onSave, investimento, tiposI
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-full max-w-md relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
           <FiX size={20} />

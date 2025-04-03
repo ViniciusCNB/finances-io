@@ -2,19 +2,12 @@
 
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
+import { Despesa } from "@/services/despesasService";
 
 interface DespesaFormProps {
   onClose: () => void;
-  onSave: (despesa: any) => void;
-  despesa?: {
-    id?: number;
-    descricao: string;
-    data: string;
-    valor: number;
-    categoria_despesa: string;
-    observacao: string;
-    forma_pagamento: string;
-  };
+  onSave: (despesa: Despesa) => void;
+  despesa?: Despesa;
 }
 
 const CATEGORIAS_DESPESA = [
@@ -41,9 +34,13 @@ const FORMAS_PAGAMENTO = [
 export default function DespesaForm({ onClose, onSave, despesa }: DespesaFormProps) {
   const [formData, setFormData] = useState({
     descricao: despesa?.descricao || "",
-    data: despesa?.data || new Date().toISOString().split("T")[0],
+    data: despesa?.data
+      ? typeof despesa.data === "string"
+        ? despesa.data
+        : despesa.data.toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
     valor: despesa?.valor || 0,
-    categoria_despesa: despesa?.categoria_despesa || "Outros",
+    categoria: despesa?.categoria || "Outros",
     observacao: despesa?.observacao || "",
     forma_pagamento: despesa?.forma_pagamento || "Pix",
   });
@@ -98,7 +95,7 @@ export default function DespesaForm({ onClose, onSave, despesa }: DespesaFormPro
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-full max-w-md relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
           <FiX size={20} />
@@ -166,8 +163,8 @@ export default function DespesaForm({ onClose, onSave, despesa }: DespesaFormPro
               Categoria <span className="text-red-500">*</span>
             </label>
             <select
-              name="categoria_despesa"
-              value={formData.categoria_despesa}
+              name="categoria"
+              value={formData.categoria}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
             >

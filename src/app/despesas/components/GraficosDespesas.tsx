@@ -17,17 +17,10 @@ import {
   Sector,
 } from "recharts";
 import { useState } from "react";
+import { Despesa } from "@/services/despesasService";
 
 interface GraficosDespesasProps {
-  despesas: Array<{
-    id: number;
-    descricao: string;
-    data: string;
-    valor: number;
-    categoria_despesa: string;
-    observacao: string;
-    forma_pagamento: string;
-  }>;
+  despesas: Despesa[];
 }
 
 // Cores para os gráficos
@@ -50,7 +43,7 @@ export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
 
   // Calcula total por categoria
   const totalPorCategoria = despesas.reduce((acc, despesa) => {
-    const categoria = despesa.categoria_despesa;
+    const categoria = despesa.categoria;
     acc[categoria] = (acc[categoria] || 0) + despesa.valor;
     return acc;
   }, {} as Record<string, number>);

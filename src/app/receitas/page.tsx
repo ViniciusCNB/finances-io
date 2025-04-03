@@ -1,21 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiPlus, FiFilter } from "react-icons/fi";
 import ReceitaForm from "./components/ReceitaForm";
 import FiltroForm from "./components/FiltroForm";
 import TabelaReceitas from "./components/TabelaReceitas";
 import GraficosReceitas from "./components/GraficosReceitas";
 import ConfirmacaoExclusao from "./components/ConfirmacaoExclusao";
-
-// Interface para o tipo de receita
-interface Receita {
-  id: number;
-  descricao: string;
-  data: string;
-  valor: number;
-  observacao: string;
-}
+import { Receita, buscarReceitas, criarReceita, atualizarReceita, excluirReceita } from "@/services/receitasService";
 
 const Receitas = () => {
   // Estado para o modal de formulário de receita
@@ -28,66 +20,31 @@ const Receitas = () => {
   const [receitaEmEdicao, setReceitaEmEdicao] = useState<Receita | undefined>(undefined);
   // Estado para os filtros aplicados
   const [filtrosAplicados, setFiltrosAplicados] = useState<any>({});
+  // Estado para as receitas
+  const [receitas, setReceitas] = useState<Receita[]>([]);
+  // Estado para carregamento
+  const [loading, setLoading] = useState(false);
+  // Estado para erros
+  const [erro, setErro] = useState<string | null>(null);
 
-  // Estado para as receitas (mock data para demonstração)
-  const [receitas, setReceitas] = useState<Receita[]>([
-    {
-      id: 1,
-      descricao: "Salário",
-      data: "2023-04-05",
-      valor: 3500,
-      observacao: "Pagamento mensal",
-    },
-    {
-      id: 2,
-      descricao: "Freelance",
-      data: "2023-04-15",
-      valor: 800,
-      observacao: "Projeto de design",
-    },
-    {
-      id: 3,
-      descricao: "Venda de item",
-      data: "2023-04-20",
-      valor: 350,
-      observacao: "Venda pelo Marketplace",
-    },
-    {
-      id: 4,
-      descricao: "Dividendos",
-      data: "2023-05-10",
-      valor: 120,
-      observacao: "Ações PETR4",
-    },
-    {
-      id: 5,
-      descricao: "Restituição IR",
-      data: "2023-06-15",
-      valor: 1200,
-      observacao: "Restituição anual",
-    },
-    {
-      id: 6,
-      descricao: "Salário",
-      data: "2023-05-05",
-      valor: 3500,
-      observacao: "Pagamento mensal",
-    },
-    {
-      id: 7,
-      descricao: "Salário",
-      data: "2023-06-05",
-      valor: 3500,
-      observacao: "Pagamento mensal",
-    },
-    {
-      id: 8,
-      descricao: "Salário",
-      data: "2023-07-05",
-      valor: 3700,
-      observacao: "Pagamento mensal com aumento",
-    },
-  ]);
+  // Função para carregar as receitas
+  useEffect(() => {
+    const carregarReceitas = async () => {
+      setLoading(true);
+      setErro(null);
+      try {
+        const dadosReceitas = await buscarReceitas();
+        setReceitas(dadosReceitas);
+      } catch (error) {
+        console.error("Erro ao carregar receitas:", error);
+        setErro("Não foi possível carregar as receitas. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarReceitas();
+  }, []);
 
   // Função para filtrar as receitas com base nos filtros aplicados
   const receitasFiltradas = receitas.filter((receita) => {
@@ -121,23 +78,29 @@ const Receitas = () => {
   const totalReceitas = receitasFiltradas.reduce((acc, receita) => acc + receita.valor, 0);
 
   // Função para adicionar/editar uma receita
-  const handleSaveReceita = (receita: any) => {
-    if (receita.id) {
-      // Editar receita existente
-      setReceitas(receitas.map((r) => (r.id === receita.id ? { ...receita } : r)));
-    } else {
-      // Adicionar nova receita
-      const novaReceita = {
-        ...receita,
-        id: Math.max(0, ...receitas.map((r) => r.id)) + 1,
-      };
-      setReceitas([...receitas, novaReceita]);
+  const handleSaveReceita = async (receita: Receita) => {
+    setLoading(true);
+    setErro(null);
+    try {
+      if (receita.id) {
+        // Editar receita existente
+        const receitaAtualizada = await atualizarReceita(receita);
+        setReceitas(receitas.map((r) => (r.id === receita.id ? receitaAtualizada : r)));
+      } else {
+        // Adicionar nova receita
+        const novaReceita = await criarReceita(receita);
+        setReceitas([...receitas, novaReceita]);
+      }
+      // Fechar o modal de formulário
+      setIsFormModalOpen(false);
+      // Limpar a receita em edição
+      setReceitaEmEdicao(undefined);
+    } catch (error) {
+      console.error("Erro ao salvar receita:", error);
+      setErro("Não foi possível salvar a receita. Tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
     }
-
-    // Fechar o modal de formulário
-    setIsFormModalOpen(false);
-    // Limpar a receita em edição
-    setReceitaEmEdicao(undefined);
   };
 
   // Função para abrir o modal de edição
@@ -155,10 +118,20 @@ const Receitas = () => {
   };
 
   // Função para excluir uma receita após confirmação
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (exclusaoInfo) {
-      setReceitas(receitas.filter((r) => r.id !== exclusaoInfo.id));
-      setExclusaoInfo(null);
+      setLoading(true);
+      setErro(null);
+      try {
+        await excluirReceita(exclusaoInfo.id);
+        setReceitas(receitas.filter((r) => r.id !== exclusaoInfo.id));
+        setExclusaoInfo(null);
+      } catch (error) {
+        console.error("Erro ao excluir receita:", error);
+        setErro("Não foi possível excluir a receita. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -190,7 +163,7 @@ const Receitas = () => {
               setReceitaEmEdicao(undefined);
               setIsFormModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer"
           >
             <FiPlus size={18} />
             <span>Nova Receita</span>
@@ -198,24 +171,49 @@ const Receitas = () => {
         </div>
       </div>
 
+      {/* Mensagem de erro */}
+      {erro && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{erro}</div>}
+
       {/* Dashboard com cards e gráficos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card com total de receitas */}
         <div className="p-6 bg-white rounded-xl shadow-sm">
           <h3 className="text-sm font-medium text-gray-500">Total de Receitas</h3>
-          <p className="text-3xl font-bold mt-2">{formatPriceValue(totalReceitas)}</p>
-          <div className="text-sm text-gray-500 mt-1">
-            {receitasFiltradas.length} {receitasFiltradas.length === 1 ? "receita" : "receitas"}
-            {Object.keys(filtrosAplicados).length > 0 ? " (filtradas)" : ""}
-          </div>
+          {loading ? (
+            <p className="text-3xl font-bold mt-2">Carregando...</p>
+          ) : (
+            <>
+              <p className="text-3xl font-bold mt-2">{formatPriceValue(totalReceitas)}</p>
+              <div className="text-sm text-gray-500 mt-1">
+                {receitasFiltradas.length} {receitasFiltradas.length === 1 ? "receita" : "receitas"}
+                {Object.keys(filtrosAplicados).length > 0 ? " (filtradas)" : ""}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Tabela de receitas */}
-      <TabelaReceitas receitas={receitasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
-
       {/* Gráficos */}
-      <GraficosReceitas receitas={receitasFiltradas} />
+      {loading ? (
+        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
+          <p>Carregando gráficos...</p>
+        </div>
+      ) : (
+        <GraficosReceitas receitas={receitasFiltradas} />
+      )}
+
+      {/* Tabela de receitas */}
+      {loading && receitas.length === 0 ? (
+        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
+          <p>Carregando receitas...</p>
+        </div>
+      ) : receitas.length === 0 ? (
+        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
+          <p>Nenhuma receita encontrada. Adicione sua primeira receita!</p>
+        </div>
+      ) : (
+        <TabelaReceitas receitas={receitasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
+      )}
 
       {/* Modal para adicionar/editar receita */}
       {isFormModalOpen && (

@@ -7,16 +7,13 @@ import FiltroForm from "./components/FiltroForm";
 import TabelaInvestimentos from "./components/TabelaInvestimentos";
 import GraficosInvestimentos from "./components/GraficosInvestimentos";
 import ConfirmacaoExclusao from "./components/ConfirmacaoExclusao";
-
-// Interface para representar o modelo de Investimento
-interface Investimento {
-  id: number;
-  descricao: string;
-  valor: number;
-  quantidade: number;
-  tipo: string;
-  instituicao: string;
-}
+import {
+  Investimento,
+  buscarInvestimentos,
+  criarInvestimento,
+  atualizarInvestimento,
+  excluirInvestimento as excluirInvestimentoAPI,
+} from "@/services/investimentosService";
 
 // Tipos de investimento disponíveis (readonly para evitar mudanças acidentais)
 export const TIPOS_INVESTIMENTO = [
@@ -39,57 +36,32 @@ export default function Investimentos() {
   const [investimentoAtual, setInvestimentoAtual] = useState<Investimento | null>(null);
 
   // Estado para armazenar a lista de investimentos
-  const [investimentos, setInvestimentos] = useState<Investimento[]>([
-    // Dados de exemplo para demonstração
-    {
-      id: 1,
-      descricao: "PETR4 - Petrobras",
-      valor: 28.5,
-      quantidade: 100,
-      tipo: "Ações",
-      instituicao: "Corretora XP",
-    },
-    {
-      id: 2,
-      descricao: "KNRI11 - Kinea Renda Imobiliária",
-      valor: 142.8,
-      quantidade: 50,
-      tipo: "Fundos Imobiliários",
-      instituicao: "Corretora XP",
-    },
-    {
-      id: 3,
-      descricao: "Tesouro IPCA+ 2026",
-      valor: 3500.0,
-      quantidade: 1,
-      tipo: "Tesouro Direto",
-      instituicao: "Banco do Brasil",
-    },
-    {
-      id: 4,
-      descricao: "Bitcoin",
-      valor: 180000.0,
-      quantidade: 0.05,
-      tipo: "Criptomoedas",
-      instituicao: "Binance",
-    },
-    {
-      id: 5,
-      descricao: "CDB Banco Inter - 120%",
-      valor: 10000.0,
-      quantidade: 1,
-      tipo: "CDB",
-      instituicao: "Banco Inter",
-    },
-    {
-      id: 6,
-      descricao: "Poupança",
-      valor: 5000.0,
-      quantidade: 1,
-      tipo: "Poupança",
-      instituicao: "Caixa Econômica",
-    },
-  ]);
+  const [investimentos, setInvestimentos] = useState<Investimento[]>([]);
+
+  // Estado para controle de carregamento
+  const [loading, setLoading] = useState(false);
+
+  // Estado para controle de erros
+  const [erro, setErro] = useState<string | null>(null);
+
+  // Função para carregar os investimentos da API
+  useEffect(() => {
+    const carregarInvestimentos = async () => {
+      setLoading(true);
+      setErro(null);
+      try {
+        const dados = await buscarInvestimentos();
+        setInvestimentos(dados);
+      } catch (error) {
+        console.error("Erro ao carregar investimentos:", error);
+        setErro("Não foi possível carregar os investimentos. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarInvestimentos();
+  }, []);
 
   // Estado para armazenar os filtros aplicados
   const [filtrosAplicados, setFiltrosAplicados] = useState<{
@@ -134,18 +106,27 @@ export default function Investimentos() {
   const valorTotalInvestimentos = investimentosFiltrados.reduce((total, inv) => total + inv.valor * inv.quantidade, 0);
 
   // Função para salvar um novo investimento ou atualizar um existente
-  const salvarInvestimento = (investimento: Investimento) => {
-    if (investimento.id) {
-      // Atualizar investimento existente
-      setInvestimentos((prev) => prev.map((inv) => (inv.id === investimento.id ? investimento : inv)));
-    } else {
-      // Adicionar novo investimento
-      const novoId = Math.max(0, ...investimentos.map((inv) => inv.id)) + 1;
-      setInvestimentos((prev) => [...prev, { ...investimento, id: novoId }]);
+  const salvarInvestimento = async (investimento: Investimento) => {
+    setLoading(true);
+    setErro(null);
+    try {
+      if (investimento.id) {
+        // Atualizar investimento existente
+        const investimentoAtualizado = await atualizarInvestimento(investimento);
+        setInvestimentos((prev) => prev.map((inv) => (inv.id === investimento.id ? investimentoAtualizado : inv)));
+      } else {
+        // Adicionar novo investimento
+        const novoInvestimento = await criarInvestimento(investimento);
+        setInvestimentos((prev) => [...prev, novoInvestimento]);
+      }
+      // Fechar o modal
+      setModalAberto(null);
+    } catch (error) {
+      console.error("Erro ao salvar investimento:", error);
+      setErro("Não foi possível salvar o investimento. Tente novamente mais tarde.");
+    } finally {
+      setLoading(false);
     }
-
-    // Fechar o modal
-    setModalAberto(null);
   };
 
   // Função para iniciar a edição de um investimento
@@ -161,11 +142,21 @@ export default function Investimentos() {
   };
 
   // Função para excluir um investimento
-  const excluirInvestimento = () => {
-    if (investimentoAtual) {
-      setInvestimentos((prev) => prev.filter((inv) => inv.id !== investimentoAtual.id));
-      setModalAberto(null);
-      setInvestimentoAtual(null);
+  const excluirInvestimento = async () => {
+    if (investimentoAtual?.id) {
+      setLoading(true);
+      setErro(null);
+      try {
+        await excluirInvestimentoAPI(investimentoAtual.id);
+        setInvestimentos((prev) => prev.filter((inv) => inv.id !== investimentoAtual.id));
+        setModalAberto(null);
+        setInvestimentoAtual(null);
+      } catch (error) {
+        console.error("Erro ao excluir investimento:", error);
+        setErro("Não foi possível excluir o investimento. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -184,14 +175,14 @@ export default function Investimentos() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Investimentos</h1>
 
         <div className="flex gap-3">
           <button
             onClick={() => setModalAberto("filtrar")}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
           >
             <FiFilter />
             Filtrar
@@ -202,37 +193,66 @@ export default function Investimentos() {
               setInvestimentoAtual(null);
               setModalAberto("adicionar");
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
           >
             <FiPlus />
-            Adicionar Investimento
+            Novo Investimento
           </button>
         </div>
       </div>
+
+      {/* Mensagem de erro */}
+      {erro && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">{erro}</div>}
 
       {/* Dashboard Card */}
       <div className="bg-white rounded-xl p-6 shadow mb-8">
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Total Investido</h2>
         <div className="flex items-end gap-4">
-          <div className="text-3xl font-bold text-purple-600">{formatarPreco(valorTotalInvestimentos)}</div>
-          <div className="text-sm text-gray-500">{investimentosFiltrados.length} investimentos</div>
+          {loading && investimentos.length === 0 ? (
+            <div className="text-3xl font-bold text-purple-600">Carregando...</div>
+          ) : (
+            <>
+              <div className="text-3xl font-bold text-purple-600">{formatarPreco(valorTotalInvestimentos)}</div>
+              <div className="text-sm text-gray-500">{investimentosFiltrados.length} investimentos</div>
+            </>
+          )}
         </div>
       </div>
 
       {/* Gráficos */}
       <div className="mb-8">
-        <GraficosInvestimentos investimentos={investimentosFiltrados} formatarPreco={formatarPreco} />
+        {loading && investimentos.length === 0 ? (
+          <div className="bg-white p-6 rounded-xl shadow text-center">
+            <p>Carregando gráficos...</p>
+          </div>
+        ) : investimentos.length === 0 ? (
+          <div className="bg-white p-6 rounded-xl shadow text-center">
+            <p>Nenhum investimento encontrado. Adicione seu primeiro investimento!</p>
+          </div>
+        ) : (
+          <GraficosInvestimentos investimentos={investimentosFiltrados} formatarPreco={formatarPreco} />
+        )}
       </div>
 
       {/* Tabela de Investimentos */}
       <div>
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Seus Investimentos</h2>
-        <TabelaInvestimentos
-          investimentos={investimentosFiltrados}
-          onEdit={editarInvestimento}
-          onDelete={confirmarExclusao}
-          formatarPreco={formatarPreco}
-        />
+        {loading && investimentos.length === 0 ? (
+          <div className="bg-white p-6 rounded-xl shadow text-center">
+            <p>Carregando investimentos...</p>
+          </div>
+        ) : investimentos.length === 0 ? (
+          <div className="bg-white p-6 rounded-xl shadow text-center">
+            <p>Nenhum investimento encontrado. Adicione seu primeiro investimento!</p>
+          </div>
+        ) : (
+          <TabelaInvestimentos
+            investimentos={investimentosFiltrados}
+            onEdit={editarInvestimento}
+            onDelete={confirmarExclusao}
+            formatarPreco={formatarPreco}
+          />
+        )}
       </div>
 
       {/* Modal de Adicionar/Editar Investimento */}
@@ -251,7 +271,6 @@ export default function Investimentos() {
           onClose={() => setModalAberto(null)}
           onFilter={aplicarFiltros}
           filtrosAtuais={filtrosAplicados}
-          investimentos={investimentos}
           tiposInvestimento={TIPOS_INVESTIMENTO}
         />
       )}
@@ -259,9 +278,10 @@ export default function Investimentos() {
       {/* Modal de Confirmação de Exclusão */}
       {modalAberto === "confirmarExclusao" && investimentoAtual && (
         <ConfirmacaoExclusao
-          onClose={() => setModalAberto(null)}
+          id={investimentoAtual.id}
+          descricao={investimentoAtual.descricao}
           onConfirm={excluirInvestimento}
-          item={investimentoAtual}
+          onCancel={() => setModalAberto(null)}
         />
       )}
     </div>
