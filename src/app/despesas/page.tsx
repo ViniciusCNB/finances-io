@@ -170,7 +170,7 @@ const Despesas = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
           >
             <FiFilter size={18} />
             <span>Filtrar</span>

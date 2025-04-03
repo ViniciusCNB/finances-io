@@ -46,27 +46,22 @@ const Receitas = () => {
     carregarReceitas();
   }, []);
 
-  // Função para filtrar as receitas com base nos filtros aplicados
   const receitasFiltradas = receitas.filter((receita) => {
     // Se não há filtros, retorna todas as receitas
     if (Object.keys(filtrosAplicados).length === 0) return true;
 
-    // Filtrar por data de início
     if (filtrosAplicados.dataInicio && new Date(receita.data) < new Date(filtrosAplicados.dataInicio)) {
       return false;
     }
 
-    // Filtrar por data de fim
     if (filtrosAplicados.dataFim && new Date(receita.data) > new Date(filtrosAplicados.dataFim)) {
       return false;
     }
 
-    // Filtrar por valor mínimo
     if (filtrosAplicados.valorMin && receita.valor < filtrosAplicados.valorMin) {
       return false;
     }
 
-    // Filtrar por valor máximo
     if (filtrosAplicados.valorMax && receita.valor > filtrosAplicados.valorMax) {
       return false;
     }
@@ -74,26 +69,20 @@ const Receitas = () => {
     return true;
   });
 
-  // Calcular o total de receitas filtradas
   const totalReceitas = receitasFiltradas.reduce((acc, receita) => acc + receita.valor, 0);
 
-  // Função para adicionar/editar uma receita
   const handleSaveReceita = async (receita: Receita) => {
     setLoading(true);
     setErro(null);
     try {
       if (receita.id) {
-        // Editar receita existente
         const receitaAtualizada = await atualizarReceita(receita);
         setReceitas(receitas.map((r) => (r.id === receita.id ? receitaAtualizada : r)));
       } else {
-        // Adicionar nova receita
         const novaReceita = await criarReceita(receita);
         setReceitas([...receitas, novaReceita]);
       }
-      // Fechar o modal de formulário
       setIsFormModalOpen(false);
-      // Limpar a receita em edição
       setReceitaEmEdicao(undefined);
     } catch (error) {
       console.error("Erro ao salvar receita:", error);
@@ -103,13 +92,11 @@ const Receitas = () => {
     }
   };
 
-  // Função para abrir o modal de edição
   const handleEdit = (receita: Receita) => {
     setReceitaEmEdicao(receita);
     setIsFormModalOpen(true);
   };
 
-  // Função para abrir o modal de confirmação de exclusão
   const handleDeleteConfirmation = (id: number) => {
     const receita = receitas.find((r) => r.id === id);
     if (receita) {
@@ -153,7 +140,7 @@ const Receitas = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
           >
             <FiFilter size={18} />
             <span>Filtrar</span>

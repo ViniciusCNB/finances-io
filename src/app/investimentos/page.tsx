@@ -175,7 +175,7 @@ export default function Investimentos() {
   };
 
   return (
-    <div className="">
+    <div className="w-[1200px]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Investimentos</h1>
 
@@ -272,6 +272,7 @@ export default function Investimentos() {
           onFilter={aplicarFiltros}
           filtrosAtuais={filtrosAplicados}
           tiposInvestimento={TIPOS_INVESTIMENTO}
+          investimentos={investimentos}
         />
       )}
 

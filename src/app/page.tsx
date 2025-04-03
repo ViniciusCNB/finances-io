@@ -77,7 +77,7 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-[1200px]">
       <h1 className="text-2xl font-bold text-gray-800">Dashboard Financeiro</h1>
 
       {resumo.erro && (
@@ -93,7 +93,10 @@ export default function Home() {
           {/* Cards de resumo */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Receitas */}
-            <Link href="/receitas" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <Link
+              href="/receitas"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-gray-500">Receitas</h3>
                 <div className="bg-green-100 p-2 rounded-lg">
@@ -104,7 +107,10 @@ export default function Home() {
             </Link>
 
             {/* Despesas */}
-            <Link href="/despesas" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <Link
+              href="/despesas"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-gray-500">Despesas</h3>
                 <div className="bg-red-100 p-2 rounded-lg">
@@ -128,7 +134,10 @@ export default function Home() {
             </div>
 
             {/* Investimentos */}
-            <Link href="/investimentos" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            <Link
+              href="/investimentos"
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-gray-500">Investimentos</h3>
                 <div className="bg-purple-100 p-2 rounded-lg">

@@ -119,7 +119,7 @@ export default function GraficosInvestimentos({ investimentos, formatarPreco }: 
             type="button"
             className={`px-3 py-1.5 text-sm font-medium ${
               visualizacao === "tipos" ? "bg-purple-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            } border border-gray-300 rounded-l-lg`}
+            } border border-gray-300 rounded-l-lg cursor-pointer`}
             onClick={() => setVisualizacao("tipos")}
           >
             Por Tipo
@@ -128,7 +128,7 @@ export default function GraficosInvestimentos({ investimentos, formatarPreco }: 
             type="button"
             className={`px-3 py-1.5 text-sm font-medium ${
               visualizacao === "instituicoes" ? "bg-purple-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-            } border border-l-0 border-gray-300 rounded-r-lg`}
+            } border border-l-0 border-gray-300 rounded-r-lg cursor-pointer`}
             onClick={() => setVisualizacao("instituicoes")}
           >
             Por Instituição
@@ -201,7 +201,7 @@ export default function GraficosInvestimentos({ investimentos, formatarPreco }: 
               ratio={4 / 3}
               stroke="#fff"
               fill="#8884d8"
-              content={({ root, depth, x, y, width, height, index, payload, colors, rank, name }) => {
+              content={({ depth, x, y, width, height, index, name }: any) => {
                 const item = dadosTreemap[index];
                 return (
                   <g>

@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { FiEdit, FiTrash2, FiChevronUp, FiChevronDown } from "react-icons/fi";
-
-interface Investimento {
-  id: number;
-  descricao: string;
-  valor: number;
-  quantidade: number;
-  tipo: string;
-  instituicao: string;
-}
+import { Investimento } from "@/services/investimentosService";
 
 interface TabelaInvestimentosProps {
   investimentos: Investimento[];
@@ -176,10 +168,16 @@ export default function TabelaInvestimentos({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex gap-3 justify-end">
-                    <button onClick={() => onEdit(investimento)} className="text-indigo-600 hover:text-indigo-900">
+                    <button
+                      onClick={() => onEdit(investimento)}
+                      className="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                    >
                       <FiEdit size={18} />
                     </button>
-                    <button onClick={() => onDelete(investimento)} className="text-red-600 hover:text-red-900">
+                    <button
+                      onClick={() => onDelete(investimento)}
+                      className="text-red-600 hover:text-red-900 cursor-pointer"
+                    >
                       <FiTrash2 size={18} />
                     </button>
                   </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
+import { Investimento } from "@/services/investimentosService";
 
 interface FiltroFormProps {
   onClose: () => void;
@@ -12,14 +13,7 @@ interface FiltroFormProps {
     tipos?: string[];
     instituicoes?: string[];
   };
-  investimentos: Array<{
-    id: number;
-    descricao: string;
-    valor: number;
-    quantidade: number;
-    tipo: string;
-    instituicao: string;
-  }>;
+  investimentos?: Investimento[];
   tiposInvestimento: readonly string[];
 }
 
@@ -27,7 +21,7 @@ export default function FiltroForm({
   onClose,
   onFilter,
   filtrosAtuais = {},
-  investimentos,
+  investimentos = [],
   tiposInvestimento,
 }: FiltroFormProps) {
   const [filtros, setFiltros] = useState({
@@ -37,13 +31,18 @@ export default function FiltroForm({
     instituicoes: filtrosAtuais.instituicoes || [],
   });
 
-  // Extrair lista única de instituições dos investimentos
+  // Lista de instituições disponíveis
   const [instituicoesDisponiveis, setInstituicoesDisponiveis] = useState<string[]>([]);
 
   useEffect(() => {
-    // Extrair todas as instituições únicas
-    const instituicoes = [...new Set(investimentos.map((inv) => inv.instituicao))];
-    setInstituicoesDisponiveis(instituicoes);
+    // Extrair todas as instituições únicas se disponíveis
+    if (investimentos && investimentos.length > 0) {
+      const instituicoes = [...new Set(investimentos.map((inv) => inv.instituicao))];
+      setInstituicoesDisponiveis(instituicoes);
+    } else {
+      // Se não houver investimentos, usar lista vazia
+      setInstituicoesDisponiveis([]);
+    }
   }, [investimentos]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,7 +175,11 @@ export default function FiltroForm({
           )}
 
           <div className="flex justify-between pt-2">
-            <button type="button" onClick={limparFiltros} className="px-4 py-2 text-purple-600 hover:text-purple-800">
+            <button
+              type="button"
+              onClick={limparFiltros}
+              className="px-4 py-2 text-purple-600 hover:text-purple-800 cursor-pointer"
+            >
               Limpar Filtros
             </button>
 
@@ -184,11 +187,14 @@ export default function FiltroForm({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 Cancelar
               </button>
-              <button type="submit" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
+              >
                 Aplicar Filtros
               </button>
             </div>
