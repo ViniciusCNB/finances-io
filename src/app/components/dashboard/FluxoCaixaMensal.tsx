@@ -49,14 +49,18 @@ export default function FluxoCaixaMensal({ despesas, receitas, formatarValor }: 
     // Calcular total de receitas por mês
     receitas.forEach((receita) => {
       const data = new Date(receita.data);
-      const mes = data.getMonth();
+      // Ajustar o fuso horário
+      const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+      const mes = dataAjustada.getMonth();
       receitasPorMes[mes] += receita.valor;
     });
 
     // Calcular total de despesas por mês
     despesas.forEach((despesa) => {
       const data = new Date(despesa.data);
-      const mes = data.getMonth();
+      // Ajustar o fuso horário
+      const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+      const mes = dataAjustada.getMonth();
       despesasPorMes[mes] += despesa.valor;
     });
 

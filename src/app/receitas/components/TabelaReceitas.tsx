@@ -53,7 +53,11 @@ export default function TabelaReceitas({ receitas, onEdit, onDelete }: TabelaRec
 
   const formatarData = (dataString: string) => {
     const data = new Date(dataString);
-    return data.toLocaleDateString("pt-BR");
+
+    // Ajustar o fuso horário adicionando o timezone UTC
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+
+    return dataAjustada.toLocaleDateString("pt-BR");
   };
 
   const formatPriceValue = (value: number) => {

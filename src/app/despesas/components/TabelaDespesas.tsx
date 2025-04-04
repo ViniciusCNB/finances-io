@@ -54,7 +54,11 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
 
   const formatarData = (dataString: string | Date) => {
     const data = dataString instanceof Date ? dataString : new Date(dataString);
-    return data.toLocaleDateString("pt-BR");
+
+    // Ajustar o fuso horário adicionando o timezone UTC
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+
+    return dataAjustada.toLocaleDateString("pt-BR");
   };
 
   const SortArrow = ({ column }: { column: OrderBy }) => {

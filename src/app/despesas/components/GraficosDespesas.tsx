@@ -58,7 +58,9 @@ export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
   // Calcula total por mês para o gráfico de evolução
   const totalPorMes = despesas.reduce((acc, despesa) => {
     const data = new Date(despesa.data);
-    const mesAno = `${data.getMonth() + 1}/${data.getFullYear()}`;
+    // Ajustar o fuso horário
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+    const mesAno = `${dataAjustada.getMonth() + 1}/${dataAjustada.getFullYear()}`;
     acc[mesAno] = (acc[mesAno] || 0) + despesa.valor;
     return acc;
   }, {} as Record<string, number>);

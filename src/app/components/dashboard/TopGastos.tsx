@@ -18,7 +18,9 @@ export default function TopGastos({ despesas, formatarValor }: TopGastosProps) {
   // Filtrar despesas do mês atual
   const despesasDoMes = despesas.filter((despesa) => {
     const dataDespesa = new Date(despesa.data);
-    return dataDespesa >= primeiroDiaDoMes && dataDespesa <= ultimoDiaDoMes;
+    // Ajustar o fuso horário
+    const dataAjustada = new Date(dataDespesa.getTime() + dataDespesa.getTimezoneOffset() * 60000);
+    return dataAjustada >= primeiroDiaDoMes && dataAjustada <= ultimoDiaDoMes;
   });
 
   // Ordenar despesas por valor (maior para menor)
@@ -50,7 +52,11 @@ export default function TopGastos({ despesas, formatarValor }: TopGastosProps) {
   // Formatar data para exibição
   const formatarData = (dataStr: string): string => {
     const data = new Date(dataStr);
-    return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+
+    // Ajustar o fuso horário adicionando o timezone UTC
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+
+    return dataAjustada.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   };
 
   return (

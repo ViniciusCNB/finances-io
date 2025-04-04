@@ -28,12 +28,14 @@ export default function Notificacoes({ despesas, receitas, formatarValor }: Noti
 
     const despesasDoMes = despesas.filter((despesa) => {
       const dataDespesa = new Date(despesa.data);
-      return dataDespesa >= primeiroDiaDoMes && dataDespesa <= ultimoDiaDoMes;
+      const dataAjustada = new Date(dataDespesa.getTime() + dataDespesa.getTimezoneOffset() * 60000);
+      return dataAjustada >= primeiroDiaDoMes && dataAjustada <= ultimoDiaDoMes;
     });
 
     const receitasDoMes = receitas.filter((receita) => {
       const dataReceita = new Date(receita.data);
-      return dataReceita >= primeiroDiaDoMes && dataReceita <= ultimoDiaDoMes;
+      const dataAjustada = new Date(dataReceita.getTime() + dataReceita.getTimezoneOffset() * 60000);
+      return dataAjustada >= primeiroDiaDoMes && dataAjustada <= ultimoDiaDoMes;
     });
 
     const totalDespesasDoMes = despesasDoMes.reduce((acc, d) => acc + d.valor, 0);
@@ -54,9 +56,10 @@ export default function Notificacoes({ despesas, receitas, formatarValor }: Noti
     // Analisar próximas despesas
     despesas.forEach((despesa) => {
       const dataDespesa = new Date(despesa.data);
+      const dataAjustada = new Date(dataDespesa.getTime() + dataDespesa.getTimezoneOffset() * 60000);
 
       // Despesas que vencem nos próximos 7 dias
-      if (dataDespesa > hoje && dataDespesa <= proximos7dias) {
+      if (dataAjustada > hoje && dataAjustada <= proximos7dias) {
         notificacoes.push({
           tipo: "pendente",
           mensagem: `Despesa próxima: ${despesa.descricao}`,
@@ -69,9 +72,10 @@ export default function Notificacoes({ despesas, receitas, formatarValor }: Noti
     // Receitas próximas
     receitas.forEach((receita) => {
       const dataReceita = new Date(receita.data);
+      const dataAjustada = new Date(dataReceita.getTime() + dataReceita.getTimezoneOffset() * 60000);
 
       // Receitas que serão recebidas nos próximos 7 dias
-      if (dataReceita > hoje && dataReceita <= proximos7dias) {
+      if (dataAjustada > hoje && dataAjustada <= proximos7dias) {
         notificacoes.push({
           tipo: "positivo",
           mensagem: `Receita próxima: ${receita.descricao}`,
@@ -90,7 +94,11 @@ export default function Notificacoes({ despesas, receitas, formatarValor }: Noti
   // Formato de data para exibição
   const formatarData = (dataStr: string): string => {
     const data = new Date(dataStr);
-    return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" });
+
+    // Ajustar o fuso horário adicionando o timezone UTC
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+
+    return dataAjustada.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" });
   };
 
   // Notificações mostradas quando não expandido
