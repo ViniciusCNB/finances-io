@@ -76,22 +76,65 @@ export default function Home() {
     });
   };
 
+  // Componentes de esqueleto para carregamento
+  const CardSkeleton = () => (
+    <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+      <div className="flex items-center justify-between mb-3">
+        <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded-lg"></div>
+      </div>
+      <div className="h-7 bg-gray-200 rounded w-2/3 mt-2"></div>
+    </div>
+  );
+
+  const GraphSkeleton = () => (
+    <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
+      <div className="h-64 bg-gray-200 rounded"></div>
+    </div>
+  );
+
+  const NotificationsSkeleton = () => (
+    <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="space-y-3">
+        <div className="h-16 bg-gray-200 rounded"></div>
+        <div className="h-16 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  );
+
+  const RecommendationsSkeleton = () => (
+    <div className="bg-white p-6 rounded-xl shadow-sm animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="space-y-3">
+        <div className="h-20 bg-gray-200 rounded"></div>
+        <div className="h-20 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6 w-[1200px]">
-      <h1 className="text-2xl font-bold text-gray-800">Dashboard Financeiro</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">Dashboard Financeiro</h1>
+      </div>
 
       {resumo.erro && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{resumo.erro}</div>
       )}
 
-      {resumo.loading ? (
-        <div className="text-center py-6">
-          <p className="text-gray-600">Carregando dados...</p>
-        </div>
-      ) : (
-        <>
-          {/* Cards de resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Cards de resumo */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {resumo.loading ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </>
+        ) : (
+          <>
             {/* Receitas */}
             <Link
               href="/receitas"
@@ -146,73 +189,84 @@ export default function Home() {
               </div>
               <p className="text-2xl font-bold text-gray-900">{formatarValor(resumo.totalInvestimentos)}</p>
             </Link>
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* Notificações */}
-          {!resumo.loading && (despesas.length > 0 || receitas.length > 0) && (
-            <Notificacoes despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
-          )}
+      {/* Notificações */}
+      {resumo.loading ? (
+        <NotificationsSkeleton />
+      ) : despesas.length > 0 || receitas.length > 0 ? (
+        <Notificacoes despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
+      ) : null}
 
-          {/* Resumo Financeiro com gráficos */}
-          {!resumo.loading && (
+      {/* Resumo Financeiro com gráficos */}
+      {resumo.loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
+        </div>
+      ) : (
+        <>
+          {despesas.length > 0 && receitas.length > 0 && (
             <>
-              {despesas.length > 0 && receitas.length > 0 && (
-                <>
-                  <ResumoFinanceiro despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
-                  <FluxoCaixaMensal despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
-                </>
-              )}
-
-              {despesas.length > 0 && <TopGastos despesas={despesas} formatarValor={formatarValor} />}
-
-              {investimentos.length > 0 && (
-                <DistribuicaoInvestimentos investimentos={investimentos} formatarPreco={formatarValor} />
-              )}
+              <ResumoFinanceiro despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
+              <FluxoCaixaMensal despesas={despesas} receitas={receitas} formatarValor={formatarValor} />
             </>
           )}
 
-          {/* Seção de dicas */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Recomendações</h2>
+          {despesas.length > 0 && <TopGastos despesas={despesas} formatarValor={formatarValor} />}
 
-            <div className="space-y-4">
-              {resumo.saldo < 0 && (
-                <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-                  <h3 className="font-medium text-red-800">Atenção!</h3>
-                  <p className="text-red-700 mt-1">Seu saldo está negativo. Considere reduzir algumas despesas.</p>
-                </div>
-              )}
-
-              {resumo.totalInvestimentos === 0 && (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <h3 className="font-medium text-blue-800">Investimentos</h3>
-                  <p className="text-blue-700 mt-1">
-                    Você ainda não possui investimentos registrados. Que tal começar a investir?
-                  </p>
-                </div>
-              )}
-
-              {resumo.saldo > 0 && resumo.totalInvestimentos === 0 && (
-                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                  <h3 className="font-medium text-green-800">Oportunidade</h3>
-                  <p className="text-green-700 mt-1">
-                    Você possui saldo positivo. Considere investir parte desse valor!
-                  </p>
-                </div>
-              )}
-
-              {resumo.saldo >= 0 && resumo.totalDespesas > 0 && (
-                <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <h3 className="font-medium text-purple-800">Dica</h3>
-                  <p className="text-purple-700 mt-1">
-                    Analise suas maiores despesas e veja se é possível reduzi-las para aumentar sua capacidade de
-                    investimento.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          {investimentos.length > 0 && (
+            <DistribuicaoInvestimentos investimentos={investimentos} formatarPreco={formatarValor} />
+          )}
         </>
+      )}
+
+      {/* Seção de dicas */}
+      {resumo.loading ? (
+        <RecommendationsSkeleton />
+      ) : (
+        <div className="bg-white p-6 rounded-xl shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Recomendações</h2>
+
+          <div className="space-y-4">
+            {resumo.saldo < 0 && (
+              <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                <h3 className="font-medium text-red-800">Atenção!</h3>
+                <p className="text-red-700 mt-1">Seu saldo está negativo. Considere reduzir algumas despesas.</p>
+              </div>
+            )}
+
+            {resumo.totalInvestimentos === 0 && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <h3 className="font-medium text-blue-800">Investimentos</h3>
+                <p className="text-blue-700 mt-1">
+                  Você ainda não possui investimentos registrados. Que tal começar a investir?
+                </p>
+              </div>
+            )}
+
+            {resumo.saldo > 0 && resumo.totalInvestimentos === 0 && (
+              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                <h3 className="font-medium text-green-800">Oportunidade</h3>
+                <p className="text-green-700 mt-1">Você possui saldo positivo. Considere investir parte desse valor!</p>
+              </div>
+            )}
+
+            {resumo.saldo >= 0 && resumo.totalDespesas > 0 && (
+              <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                <h3 className="font-medium text-purple-800">Dica</h3>
+                <p className="text-purple-700 mt-1">
+                  Analise suas maiores despesas e veja se é possível reduzi-las para aumentar sua capacidade de
+                  investimento.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

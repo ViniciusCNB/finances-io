@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiArrowUp, FiArrowDown, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiArrowUp, FiArrowDown, FiEdit, FiTrash2 } from "react-icons/fi";
 import { Despesa } from "@/services/despesasService";
 
 interface TabelaDespesasProps {
@@ -159,14 +159,14 @@ export default function TabelaDespesas({ despesas, onEdit, onDelete }: TabelaDes
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
                       onClick={() => onEdit(despesa)}
-                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      className="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer"
                       title="Editar"
                     >
-                      <FiEdit2 size={18} />
+                      <FiEdit size={18} />
                     </button>
                     <button
                       onClick={() => onDelete(despesa.id as number)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 cursor-pointer"
                       title="Excluir"
                     >
                       <FiTrash2 size={18} />

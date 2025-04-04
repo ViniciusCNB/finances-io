@@ -201,6 +201,37 @@ export default function Investimentos() {
     });
   };
 
+  // Componentes de esqueleto para carregamento
+  const CardSkeleton = () => (
+    <div className="bg-white rounded-xl p-6 shadow mb-8 animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
+      <div className="flex items-end gap-4">
+        <div className="h-8 bg-gray-200 rounded w-2/5"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/5"></div>
+      </div>
+    </div>
+  );
+
+  const GraphSkeleton = () => (
+    <div className="bg-white rounded-xl p-6 shadow-sm mb-8 animate-pulse">
+      <div className="h-5 bg-gray-200 rounded w-1/3 mb-5"></div>
+      <div className="h-64 bg-gray-200 rounded"></div>
+    </div>
+  );
+
+  const TableSkeleton = () => (
+    <div className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
+      <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-[1200px]">
       <div className="flex justify-between items-center mb-6">
@@ -209,7 +240,7 @@ export default function Investimentos() {
         <div className="flex gap-3">
           <button
             onClick={() => setModalAberto("filtrar")}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer"
           >
             <FiFilter />
             Filtrar
@@ -220,7 +251,7 @@ export default function Investimentos() {
               setInvestimentoAtual(null);
               setModalAberto("adicionar");
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition cursor-pointer"
           >
             <FiPlus />
             Novo Investimento
@@ -232,81 +263,78 @@ export default function Investimentos() {
       {erro && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">{erro}</div>}
 
       {/* Dashboard Card */}
-      <div className="bg-white rounded-xl p-6 shadow mb-8">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Total Investido</h2>
-        <div className="flex items-end gap-4">
-          {loading && investimentos.length === 0 ? (
-            <div className="text-3xl font-bold text-purple-600">Carregando...</div>
-          ) : (
-            <>
-              <div className="text-3xl font-bold text-purple-600">{formatarPreco(valorTotalInvestimentos)}</div>
-              <div className="text-sm text-gray-500">{investimentosFiltrados.length} investimentos</div>
-            </>
-          )}
+      {loading ? (
+        <CardSkeleton />
+      ) : (
+        <div className="p-6 bg-white rounded-xl shadow-sm mb-8">
+          <h3 className="text-sm font-medium text-gray-500">Total Investido</h3>
+          <p className="text-3xl font-bold mt-2 text-purple-600">{formatarPreco(valorTotalInvestimentos)}</p>
+          <div className="text-sm text-gray-500 mt-1">
+            {investimentosFiltrados.length} {investimentosFiltrados.length === 1 ? "investimento" : "investimentos"}
+            {Object.keys(filtros).length > 0}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Gráficos */}
-      <div className="mb-8">
-        {loading && investimentos.length === 0 ? (
-          <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p>Carregando gráficos...</p>
-          </div>
-        ) : investimentos.length === 0 ? (
-          <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p>Nenhum investimento encontrado. Adicione seu primeiro investimento!</p>
-          </div>
-        ) : (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <GraphSkeleton />
+          <GraphSkeleton />
+        </div>
+      ) : (
+        <div className="mb-8">
           <GraficosInvestimentos investimentos={investimentosFiltrados} formatarPreco={formatarPreco} />
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Tabela de Investimentos */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Seus Investimentos</h2>
-        {loading && investimentos.length === 0 ? (
-          <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p>Carregando investimentos...</p>
-          </div>
-        ) : investimentos.length === 0 ? (
-          <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p>Nenhum investimento encontrado. Adicione seu primeiro investimento!</p>
-          </div>
-        ) : (
-          <TabelaInvestimentos
-            investimentos={investimentosFiltrados}
-            onEdit={editarInvestimento}
-            onDelete={confirmarExclusao}
-            formatarPreco={formatarPreco}
-          />
-        )}
-      </div>
+      {/* Tabela de investimentos */}
+      {loading ? (
+        <TableSkeleton />
+      ) : investimentos.length === 0 ? (
+        <div className="bg-white rounded-xl p-6 shadow-sm text-center py-12">
+          <p className="text-gray-500">Nenhum investimento encontrado. Crie seu primeiro investimento!</p>
+        </div>
+      ) : (
+        <TabelaInvestimentos
+          investimentos={investimentosFiltrados}
+          onEdit={editarInvestimento}
+          onDelete={confirmarExclusao}
+          formatarPreco={formatarPreco}
+        />
+      )}
 
-      {/* Modal de Adicionar/Editar Investimento */}
-      {(modalAberto === "adicionar" || modalAberto === "editar") && (
+      {/* Modais */}
+      {modalAberto === "adicionar" && (
         <InvestimentoForm
           onClose={() => setModalAberto(null)}
           onSave={salvarInvestimento}
-          investimento={investimentoAtual || undefined}
           tiposInvestimento={TIPOS_INVESTIMENTO}
         />
       )}
 
-      {/* Modal de Filtro */}
+      {modalAberto === "editar" && investimentoAtual && (
+        <InvestimentoForm
+          onClose={() => setModalAberto(null)}
+          onSave={salvarInvestimento}
+          investimento={investimentoAtual}
+          tiposInvestimento={TIPOS_INVESTIMENTO}
+        />
+      )}
+
       {modalAberto === "filtrar" && (
         <FiltroForm
           onClose={() => setModalAberto(null)}
           onFilter={aplicarFiltros}
           filtrosAtuais={filtros}
-          tiposInvestimento={TIPOS_INVESTIMENTO}
           investimentos={investimentos}
+          tiposInvestimento={TIPOS_INVESTIMENTO}
         />
       )}
 
-      {/* Modal de Confirmação de Exclusão */}
       {modalAberto === "confirmarExclusao" && investimentoAtual && (
         <ConfirmacaoExclusao
-          id={investimentoAtual.id}
+          id={investimentoAtual.id as number}
           descricao={investimentoAtual.descricao}
           onConfirm={excluirInvestimento}
           onCancel={() => setModalAberto(null)}

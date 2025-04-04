@@ -162,6 +162,35 @@ const Despesas = () => {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
+  // Componente de esqueleto para carregamento
+  const CardSkeleton = () => (
+    <div className="p-6 bg-white rounded-xl shadow-sm animate-pulse">
+      <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="h-8 bg-gray-200 rounded w-2/3 mt-2 mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded w-1/4 mt-1"></div>
+    </div>
+  );
+
+  const TableSkeleton = () => (
+    <div className="bg-white shadow-sm rounded-xl p-6 animate-pulse">
+      <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+      </div>
+    </div>
+  );
+
+  const GraphSkeleton = () => (
+    <div className="p-6 bg-white rounded-xl shadow-sm animate-pulse">
+      <div className="h-4 bg-gray-200 rounded w-1/3 mb-5"></div>
+      <div className="h-80 bg-gray-200 rounded"></div>
+    </div>
+  );
+
   return (
     <div className="space-y-6 w-[1200px]">
       {/* Cabeçalho com título e botões */}
@@ -170,7 +199,7 @@ const Despesas = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-200 transition cursor-pointer bg-white border border-gray-300"
           >
             <FiFilter size={18} />
             <span>Filtrar</span>
@@ -180,7 +209,7 @@ const Despesas = () => {
               setDespesaEmEdicao(undefined);
               setIsFormModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
           >
             <FiPlus size={18} />
             <span>Nova Despesa</span>
@@ -195,29 +224,44 @@ const Despesas = () => {
         </div>
       )}
 
-      {loading && <div className="text-center py-4">Carregando...</div>}
-
-      {!loading && !erro && (
-        <>
-          {/* Dashboard com cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Card com valor total de despesas */}
-            <div className="p-6 bg-white rounded-xl shadow-sm">
-              <h3 className="text-sm font-medium text-gray-500">Total de Despesas</h3>
-              <p className="text-3xl font-bold mt-2">{formatPriceValue(totalDespesas)}</p>
-              <div className="text-sm text-gray-500 mt-1">
-                {despesasFiltradas.length} {despesasFiltradas.length === 1 ? "despesa" : "despesas"}
-                {Object.keys(filtrosAplicados).length > 0 ? " (filtradas)" : ""}
-              </div>
+      {/* Dashboard com cards */}
+      <div className="">
+        {/* Card com valor total de despesas */}
+        {loading ? (
+          <CardSkeleton />
+        ) : (
+          <div className="p-6 bg-white rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500">Total de Despesas</h3>
+            <p className="text-3xl font-bold mt-2 text-blue-600">{formatPriceValue(totalDespesas)}</p>
+            <div className="text-sm text-gray-500 mt-1">
+              {despesasFiltradas.length} {despesasFiltradas.length === 1 ? "despesa" : "despesas"}
+              {Object.keys(filtrosAplicados).length > 0}
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Gráficos */}
-          <GraficosDespesas despesas={despesasFiltradas} />
+      {/* Gráficos */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
+        </div>
+      ) : (
+        <GraficosDespesas despesas={despesasFiltradas} />
+      )}
 
-          {/* Tabela de despesas */}
-          <TabelaDespesas despesas={despesasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
-        </>
+      {/* Tabela de despesas */}
+      {loading ? (
+        <TableSkeleton />
+      ) : despesas.length === 0 ? (
+        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
+          <p className="py-6">Nenhuma despesa encontrada. Adicione sua primeira despesa!</p>
+        </div>
+      ) : (
+        <TabelaDespesas despesas={despesasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
       )}
 
       {/* Modal para adicionar/editar despesa */}

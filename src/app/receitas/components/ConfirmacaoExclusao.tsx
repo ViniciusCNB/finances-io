@@ -25,10 +25,10 @@ export default function ConfirmacaoExclusao({ onConfirm, onCancel, id, descricao
         </p>
 
         <div className="flex justify-center gap-3">
-          <button onClick={onCancel} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+          <button onClick={onCancel} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
             Cancelar
           </button>
-          <button onClick={onConfirm} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          <button onClick={onConfirm} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
             Excluir
           </button>
         </div>

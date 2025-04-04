@@ -212,7 +212,7 @@ export default function FiltroForm({ onClose, onFilter, filtrosAtuais = {} }: Fi
           </div>
 
           <div className="flex justify-between pt-2">
-            <button type="button" onClick={limparFiltros} className="px-4 py-2 text-blue-600 hover:text-blue-800">
+            <button type="button" onClick={limparFiltros} className="px-4 py-2 text-blue-600 hover:text-blue-800 cursor-pointer">
               Limpar Filtros
             </button>
 
@@ -220,11 +220,11 @@ export default function FiltroForm({ onClose, onFilter, filtrosAtuais = {} }: Fi
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 Cancelar
               </button>
-              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
                 Aplicar Filtros
               </button>
             </div>

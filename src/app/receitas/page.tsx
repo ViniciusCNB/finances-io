@@ -23,7 +23,7 @@ const Receitas = () => {
   // Estado para as receitas
   const [receitas, setReceitas] = useState<Receita[]>([]);
   // Estado para carregamento
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   // Estado para erros
   const [erro, setErro] = useState<string | null>(null);
 
@@ -132,6 +132,35 @@ const Receitas = () => {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
+  // Componente de esqueleto para carregamento
+  const CardSkeleton = () => (
+    <div className="p-6 bg-white rounded-xl shadow-sm animate-pulse">
+      <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+      <div className="h-8 bg-gray-200 rounded w-2/3 mt-2 mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded w-1/4 mt-1"></div>
+    </div>
+  );
+
+  const TableSkeleton = () => (
+    <div className="bg-white shadow-sm rounded-xl p-6 animate-pulse">
+      <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+        <div className="h-10 bg-gray-200 rounded w-full"></div>
+      </div>
+    </div>
+  );
+
+  const GraphSkeleton = () => (
+    <div className="p-6 bg-white rounded-xl shadow-sm animate-pulse">
+      <div className="h-4 bg-gray-200 rounded w-1/3 mb-5"></div>
+      <div className="h-80 bg-gray-200 rounded"></div>
+    </div>
+  );
+
   return (
     <div className="space-y-6 w-[1200px]">
       {/* Cabeçalho com título e botões */}
@@ -140,7 +169,7 @@ const Receitas = () => {
         <div className="flex gap-3">
           <button
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-200 transition cursor-pointer bg-white border border-gray-300"
           >
             <FiFilter size={18} />
             <span>Filtrar</span>
@@ -150,7 +179,7 @@ const Receitas = () => {
               setReceitaEmEdicao(undefined);
               setIsFormModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer transition"
           >
             <FiPlus size={18} />
             <span>Nova Receita</span>
@@ -162,41 +191,40 @@ const Receitas = () => {
       {erro && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{erro}</div>}
 
       {/* Dashboard com cards e gráficos */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="">
         {/* Card com total de receitas */}
-        <div className="p-6 bg-white rounded-xl shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Total de Receitas</h3>
-          {loading ? (
-            <p className="text-3xl font-bold mt-2">Carregando...</p>
-          ) : (
-            <>
-              <p className="text-3xl font-bold mt-2">{formatPriceValue(totalReceitas)}</p>
-              <div className="text-sm text-gray-500 mt-1">
-                {receitasFiltradas.length} {receitasFiltradas.length === 1 ? "receita" : "receitas"}
-                {Object.keys(filtrosAplicados).length > 0 ? " (filtradas)" : ""}
-              </div>
-            </>
-          )}
-        </div>
+        {loading ? (
+          <CardSkeleton />
+        ) : (
+          <div className="p-6 bg-white rounded-xl shadow-sm">
+            <h3 className="text-sm font-medium text-gray-500">Total de Receitas</h3>
+            <p className="text-3xl font-bold mt-2 text-green-600">{formatPriceValue(totalReceitas)}</p>
+            <div className="text-sm text-gray-500 mt-1">
+              {receitasFiltradas.length} {receitasFiltradas.length === 1 ? "receita" : "receitas"}
+              {Object.keys(filtrosAplicados).length > 0}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Gráficos */}
       {loading ? (
-        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
-          <p>Carregando gráficos...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
+          <GraphSkeleton />
         </div>
       ) : (
         <GraficosReceitas receitas={receitasFiltradas} />
       )}
 
       {/* Tabela de receitas */}
-      {loading && receitas.length === 0 ? (
-        <div className="p-6 bg-white rounded-xl shadow-sm text-center">
-          <p>Carregando receitas...</p>
-        </div>
+      {loading ? (
+        <TableSkeleton />
       ) : receitas.length === 0 ? (
         <div className="p-6 bg-white rounded-xl shadow-sm text-center">
-          <p>Nenhuma receita encontrada. Adicione sua primeira receita!</p>
+          <p className="py-6">Nenhuma receita encontrada. Adicione sua primeira receita!</p>
         </div>
       ) : (
         <TabelaReceitas receitas={receitasFiltradas} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
