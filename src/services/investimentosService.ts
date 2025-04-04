@@ -6,6 +6,7 @@ export interface Investimento {
   quantidade: number;
   tipo: string;
   instituicao: string;
+  data_compra: string;
 }
 
 // Função para buscar todos os investimentos

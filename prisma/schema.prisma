@@ -39,6 +39,7 @@ model Investimento {
   quantidade  Float
   tipo        String
   instituicao String
+  data_compra DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

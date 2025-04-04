@@ -18,6 +18,7 @@ export default function InvestimentoForm({ onClose, onSave, investimento, tiposI
     quantidade: investimento?.quantidade || 0,
     tipo: investimento?.tipo || tiposInvestimento[0],
     instituicao: investimento?.instituicao || "",
+    data_compra: investimento?.data_compra || new Date().toISOString().split("T")[0],
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -60,6 +61,10 @@ export default function InvestimentoForm({ onClose, onSave, investimento, tiposI
 
     if (!formData.instituicao.trim()) {
       newErrors.instituicao = "Instituição é obrigatória";
+    }
+
+    if (!formData.data_compra) {
+      newErrors.data_compra = "Data de compra é obrigatória";
     }
 
     setErrors(newErrors);
@@ -179,6 +184,22 @@ export default function InvestimentoForm({ onClose, onSave, investimento, tiposI
               placeholder="Ex: XP Investimentos"
             />
             {errors.instituicao && <p className="mt-1 text-sm text-red-500">{errors.instituicao}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data de Compra <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              name="data_compra"
+              value={formData.data_compra}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.data_compra ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-purple-200"
+              }`}
+            />
+            {errors.data_compra && <p className="mt-1 text-sm text-red-500">{errors.data_compra}</p>}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

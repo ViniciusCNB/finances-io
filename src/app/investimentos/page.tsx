@@ -39,7 +39,7 @@ export default function Investimentos() {
   const [investimentos, setInvestimentos] = useState<Investimento[]>([]);
 
   // Estado para controle de carregamento
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Estado para controle de erros
   const [erro, setErro] = useState<string | null>(null);
@@ -48,10 +48,23 @@ export default function Investimentos() {
   useEffect(() => {
     const carregarInvestimentos = async () => {
       setLoading(true);
-      setErro(null);
       try {
-        const dados = await buscarInvestimentos();
-        setInvestimentos(dados);
+        const dadosInvestimentos = await buscarInvestimentos();
+
+        // Adicionar data_compra temporária para investimentos existentes que não a possuem
+        // Este código pode ser removido quando todos os investimentos já tiverem data_compra no banco
+        const investimentosComDataCompra = dadosInvestimentos.map((inv) => {
+          if (!inv.data_compra) {
+            return {
+              ...inv,
+              data_compra: new Date().toISOString().split("T")[0],
+            };
+          }
+          return inv;
+        });
+
+        setInvestimentos(investimentosComDataCompra);
+        setErro(null);
       } catch (error) {
         console.error("Erro ao carregar investimentos:", error);
         setErro("Não foi possível carregar os investimentos. Tente novamente mais tarde.");
@@ -64,37 +77,51 @@ export default function Investimentos() {
   }, []);
 
   // Estado para armazenar os filtros aplicados
-  const [filtrosAplicados, setFiltrosAplicados] = useState<{
+  const [filtros, setFiltros] = useState<{
     valorMin?: number;
     valorMax?: number;
     tipos?: string[];
     instituicoes?: string[];
+    dataInicio?: string;
+    dataFim?: string;
   }>({});
 
-  // Filtrar investimentos baseado nos filtros aplicados
+  // Aplicar filtros aos investimentos
   const investimentosFiltrados = investimentos.filter((inv) => {
-    const valorTotal = inv.valor * inv.quantidade;
-
-    // Filtro de valor mínimo
-    if (filtrosAplicados.valorMin && valorTotal < filtrosAplicados.valorMin) {
+    // Verificar filtro de valor mínimo
+    if (filtros.valorMin && inv.valor < parseFloat(String(filtros.valorMin))) {
       return false;
     }
 
-    // Filtro de valor máximo
-    if (filtrosAplicados.valorMax && valorTotal > filtrosAplicados.valorMax) {
+    // Verificar filtro de valor máximo
+    if (filtros.valorMax && inv.valor > parseFloat(String(filtros.valorMax))) {
       return false;
     }
 
-    // Filtro de tipos
-    if (filtrosAplicados.tipos && filtrosAplicados.tipos.length > 0) {
-      if (!filtrosAplicados.tipos.includes(inv.tipo)) {
+    // Verificar filtro de tipos
+    if (filtros.tipos && filtros.tipos.length > 0 && !filtros.tipos.includes(inv.tipo)) {
+      return false;
+    }
+
+    // Verificar filtro de instituições
+    if (filtros.instituicoes && filtros.instituicoes.length > 0 && !filtros.instituicoes.includes(inv.instituicao)) {
+      return false;
+    }
+
+    // Verificar filtro de data de início
+    if (filtros.dataInicio) {
+      const dataCompra = new Date(inv.data_compra);
+      const dataInicio = new Date(filtros.dataInicio);
+      if (dataCompra < dataInicio) {
         return false;
       }
     }
 
-    // Filtro de instituições
-    if (filtrosAplicados.instituicoes && filtrosAplicados.instituicoes.length > 0) {
-      if (!filtrosAplicados.instituicoes.includes(inv.instituicao)) {
+    // Verificar filtro de data de fim
+    if (filtros.dataFim) {
+      const dataCompra = new Date(inv.data_compra);
+      const dataFim = new Date(filtros.dataFim);
+      if (dataCompra > dataFim) {
         return false;
       }
     }
@@ -162,7 +189,7 @@ export default function Investimentos() {
 
   // Função para aplicar filtros
   const aplicarFiltros = (filtros: any) => {
-    setFiltrosAplicados(filtros);
+    setFiltros(filtros);
     setModalAberto(null);
   };
 
@@ -270,7 +297,7 @@ export default function Investimentos() {
         <FiltroForm
           onClose={() => setModalAberto(null)}
           onFilter={aplicarFiltros}
-          filtrosAtuais={filtrosAplicados}
+          filtrosAtuais={filtros}
           tiposInvestimento={TIPOS_INVESTIMENTO}
           investimentos={investimentos}
         />

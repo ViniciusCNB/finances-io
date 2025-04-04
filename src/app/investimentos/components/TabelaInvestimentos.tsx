@@ -74,6 +74,14 @@ export default function TabelaInvestimentos({
     );
   };
 
+  // Função para formatar data
+  const formatarData = (dataString: string) => {
+    const data = new Date(dataString);
+    // Ajustar o fuso horário adicionando o timezone UTC
+    const dataAjustada = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+    return dataAjustada.toLocaleDateString("pt-BR");
+  };
+
   return (
     <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-200">
       <table className="min-w-full divide-y divide-gray-200">
@@ -97,6 +105,16 @@ export default function TabelaInvestimentos({
               <div className="flex items-center">
                 Tipo
                 <IconeOrdenacao campo="tipo" className="ml-1" />
+              </div>
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group"
+              onClick={() => alterarOrdenacao("data_compra")}
+            >
+              <div className="flex items-center">
+                Data de Compra
+                <IconeOrdenacao campo="data_compra" className="ml-1" />
               </div>
             </th>
             <th
@@ -147,7 +165,7 @@ export default function TabelaInvestimentos({
         <tbody className="bg-white divide-y divide-gray-200">
           {investimentosOrdenados.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+              <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
                 Nenhum investimento encontrado
               </td>
             </tr>
@@ -158,6 +176,9 @@ export default function TabelaInvestimentos({
                   {investimento.descricao}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{investimento.tipo}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatarData(investimento.data_compra)}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{investimento.instituicao}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatarPreco(investimento.valor)}

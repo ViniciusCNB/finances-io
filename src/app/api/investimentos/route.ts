@@ -22,9 +22,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { descricao, valor, quantidade, tipo, instituicao } = body;
+    const { descricao, valor, quantidade, tipo, instituicao, data_compra } = body;
 
-    if (!descricao || valor === undefined || quantidade === undefined || !tipo || !instituicao) {
+    if (!descricao || valor === undefined || quantidade === undefined || !tipo || !instituicao || !data_compra) {
       return NextResponse.json({ error: "Dados incompletos para criar investimento" }, { status: 400 });
     }
 
@@ -52,6 +52,7 @@ export async function POST(request: Request) {
         quantidade: parseFloat(quantidade.toString()),
         tipo,
         instituicao,
+        data_compra: new Date(data_compra),
       },
     });
 

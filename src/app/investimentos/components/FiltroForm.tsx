@@ -12,6 +12,8 @@ interface FiltroFormProps {
     valorMax?: number;
     tipos?: string[];
     instituicoes?: string[];
+    dataInicio?: string;
+    dataFim?: string;
   };
   investimentos?: Investimento[];
   tiposInvestimento: readonly string[];
@@ -29,6 +31,8 @@ export default function FiltroForm({
     valorMax: filtrosAtuais.valorMax || "",
     tipos: filtrosAtuais.tipos || [],
     instituicoes: filtrosAtuais.instituicoes || [],
+    dataInicio: filtrosAtuais.dataInicio || "",
+    dataFim: filtrosAtuais.dataFim || "",
   });
 
   // Lista de instituições disponíveis
@@ -87,6 +91,8 @@ export default function FiltroForm({
       valorMax: "",
       tipos: [],
       instituicoes: [],
+      dataInicio: "",
+      dataFim: "",
     });
   };
 
@@ -127,6 +133,32 @@ export default function FiltroForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200"
                 placeholder="0,00"
               />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Período de Compra</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">De</label>
+                <input
+                  type="date"
+                  name="dataInicio"
+                  value={filtros.dataInicio}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Até</label>
+                <input
+                  type="date"
+                  name="dataFim"
+                  value={filtros.dataFim}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
             </div>
           </div>
 

@@ -41,7 +41,7 @@ export async function PUT(request: Request, { params }: Params) {
     }
 
     const body = await request.json();
-    const { descricao, valor, quantidade, tipo, instituicao } = body;
+    const { descricao, valor, quantidade, tipo, instituicao, data_compra } = body;
 
     // Verifica se o investimento existe
     const investimentoExistente = await prisma.investimento.findUnique({
@@ -80,6 +80,7 @@ export async function PUT(request: Request, { params }: Params) {
         quantidade: quantidade !== undefined ? parseFloat(quantidade.toString()) : investimentoExistente.quantidade,
         tipo: tipo ?? investimentoExistente.tipo,
         instituicao: instituicao ?? investimentoExistente.instituicao,
+        data_compra: data_compra ? new Date(data_compra) : investimentoExistente.data_compra,
       },
     });
 
