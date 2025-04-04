@@ -50,7 +50,7 @@ yarn install
 ```
 
 4. Configurando o banco de dados:
-- Crie um arquivo `.env` na raiz do projeto com as variáveis:
+- Crie um arquivo `.env` na raiz do projeto com a variável:
 ```text
 DATABASE_URL="file:./dev.db"
 ```
