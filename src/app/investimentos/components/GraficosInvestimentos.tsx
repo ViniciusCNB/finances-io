@@ -110,7 +110,7 @@ export default function GraficosInvestimentos({ investimentos, formatarPreco }: 
   const dadosAtivos = visualizacao === "tipos" ? dadosPorTipo : dadosPorInstituicao;
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow">
+    <div className="bg-white rounded-xl p-4 pb-12 shadow">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-800">Distribuição de Investimentos</h3>
 
