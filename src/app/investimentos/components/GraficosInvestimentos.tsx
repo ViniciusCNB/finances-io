@@ -223,8 +223,7 @@ export default function GraficosInvestimentos({ investimentos, formatarPreco }: 
                         y={y + height / 2}
                         textAnchor="middle"
                         fill="#fff"
-                        fontSize={12}
-                        fontWeight="bold"
+                        fontSize={14}
                       >
                         {name}
                       </text>

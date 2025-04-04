@@ -177,7 +177,7 @@ export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => [formatPriceValue(value), "Valor"]} />
+                <Tooltip formatter={(value: number, name: string) => [formatPriceValue(value), name]} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -211,7 +211,7 @@ export default function GraficosDespesas({ despesas }: GraficosDespesasProps) {
                     border: "none",
                   }}
                 />
-                <Bar dataKey="value" fill="#00C49F" radius={[0, 4, 4, 0]} barSize={34} />
+                <Bar dataKey="value" fill="#00C49F" radius={[0, 4, 4, 0]} barSize={40} />
               </RechartsBarChart>
             </ResponsiveContainer>
           </div>

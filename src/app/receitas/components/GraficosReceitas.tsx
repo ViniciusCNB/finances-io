@@ -142,21 +142,31 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
 
   const dadosAnuaisArray = Object.values(dadosAnuais).sort((a, b) => parseInt(a.name) - parseInt(b.name));
 
-  // Calcular as 5 maiores receitas para o gráfico de pizza
-  const topReceitas = [...receitas]
-    .sort((a, b) => b.valor - a.valor)
+  // Agrupar receitas por nome para o gráfico de pizza
+  const receitasAgrupadas = receitas.reduce((acc, receita) => {
+    const descricao = receita.descricao.trim();
+    if (!acc[descricao]) {
+      acc[descricao] = 0;
+    }
+    acc[descricao] += receita.valor;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Calcular as 5 maiores receitas agrupadas para o gráfico de pizza
+  const topReceitas = Object.entries(receitasAgrupadas)
+    .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
-    .map((receita) => ({
-      name: receita.descricao.length > 20 ? `${receita.descricao.substring(0, 20)}...` : receita.descricao,
-      value: receita.valor,
+    .map(([name, value]) => ({
+      name: name.length > 20 ? `${name.substring(0, 20)}...` : name,
+      value,
     }));
 
-  // Adicionar "Outras" se houver mais que 5 receitas
-  if (receitas.length > 5) {
-    const outrasValue = receitas
-      .sort((a, b) => b.valor - a.valor)
+  // Adicionar "Outras" se houver mais que 5 categorias de receitas
+  if (Object.keys(receitasAgrupadas).length > 5) {
+    const outrasValue = Object.entries(receitasAgrupadas)
+      .sort((a, b) => b[1] - a[1])
       .slice(5)
-      .reduce((sum, item) => sum + item.valor, 0);
+      .reduce((sum, [_, value]) => sum + value, 0);
 
     topReceitas.push({ name: "Outras", value: outrasValue });
   }
@@ -182,10 +192,10 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
     { subject: "Qtde.", A: receitas.length, fullMark: receitas.length * 1.5 },
   ];
 
-  // Treemap data
-  const treemapData = receitas.map((r) => ({
-    name: r.descricao.length > 15 ? `${r.descricao.substring(0, 15)}...` : r.descricao,
-    size: r.valor,
+  // Treemap data com receitas agrupadas
+  const treemapData = Object.entries(receitasAgrupadas).map(([name, value]) => ({
+    name: name.length > 15 ? `${name.substring(0, 15)}...` : name,
+    size: value,
   }));
 
   return (
@@ -198,7 +208,7 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
               : guiaAtiva === "trimestral"
               ? "Evolução Trimestral das Receitas"
               : "Evolução Anual das Receitas"}
-            
+
             <div className="inline-flex bg-gray-100 rounded-md">
               <button
                 className={`px-4 py-2 rounded-md ${
@@ -346,7 +356,7 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => [formatPriceValue(value), "Valor"]}
+                    formatter={(value: number, name: string) => [formatPriceValue(value), name]}
                     labelStyle={{ fontWeight: "bold", color: "#333" }}
                     contentStyle={{
                       borderRadius: "8px",
@@ -435,9 +445,9 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
           {treemapData.length > 0 ? (
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <Treemap data={treemapData} dataKey="size" nameKey="name" ratio={4 / 3} stroke="#fff">
+                <Treemap data={treemapData} dataKey="size" nameKey="name" stroke="#fff">
                   <Tooltip
-                    formatter={(value: number) => [formatPriceValue(value), "Valor"]}
+                    formatter={(value: number, name: string) => [formatPriceValue(value), name]}
                     contentStyle={{
                       borderRadius: "8px",
                       boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
