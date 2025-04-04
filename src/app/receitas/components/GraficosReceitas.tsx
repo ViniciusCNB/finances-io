@@ -384,7 +384,7 @@ export default function GraficosReceitas({ receitas }: GraficosReceitasProps) {
                   <PolarGrid />
                   <PolarAngleAxis dataKey="subject" />
                   <PolarRadiusAxis angle={30} domain={[0, "auto"]} />
-                  <Radar name="Valor (mil)" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                  <Radar name="Valor" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
                   <Tooltip />
                 </RadarChart>
               </ResponsiveContainer>

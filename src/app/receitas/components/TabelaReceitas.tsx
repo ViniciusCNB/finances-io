@@ -136,7 +136,7 @@ export default function TabelaReceitas({ receitas, onEdit, onDelete }: TabelaRec
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatarData(receita.data)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium text-green-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                     {formatPriceValue(receita.valor)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
