@@ -235,7 +235,7 @@ export default function Investimentos() {
   return (
     <div className="w-[1200px]">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Investimentos</h1>
+        <h1 className="text-3xl font-bold text-black">Investimentos</h1>
 
         <div className="flex gap-3">
           <button

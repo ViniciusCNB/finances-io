@@ -6,7 +6,7 @@ import { FiShoppingBag, FiDollarSign, FiBarChart2, FiHome } from "react-icons/fi
 
 const Sidebar: React.FC = () => {
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-[#1f3494] to-[#25388e]">
+    <div className="flex flex-col h-full bg-gradient-to-br from-[#1f3494] to-[#25388e] shadow-2xl">
       <nav className="flex-1 overflow-y-auto p-4">
         <h1 className="text-2xl font-bold text-white">Finances.io</h1>
         <hr className="my-4 border-t border-gray-200" />

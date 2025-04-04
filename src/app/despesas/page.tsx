@@ -195,7 +195,7 @@ const Despesas = () => {
     <div className="space-y-6 w-[1200px]">
       {/* Cabeçalho com título e botões */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Despesas</h1>
+        <h1 className="text-3xl font-bold text-black">Despesas</h1>
         <div className="flex gap-3">
           <button
             onClick={() => setIsFilterModalOpen(true)}

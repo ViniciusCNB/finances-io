@@ -117,7 +117,7 @@ export default function Home() {
   return (
     <div className="space-y-6 w-[1200px]">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard Financeiro</h1>
+        <h1 className="text-3xl font-bold text-black">Dashboard Financeiro</h1>
       </div>
 
       {resumo.erro && (
